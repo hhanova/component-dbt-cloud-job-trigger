@@ -12,6 +12,12 @@ ARTIFACTS = ["manifest.json", "catalog.json", "run_results.json"]
 
 
 def store_artifact(artifact: str, file: dict) -> None:
+    """
+    Stores file in data/out/artifacts folder
+    Args:
+        artifact: filename
+        file: Dictionary with json content to be stored
+    """
     cwd = Path(os.getcwd())
     root_dir = cwd.parent.absolute()
     artifacts_dir = (os.path.join(root_dir, "data", "out", "artifacts"))
