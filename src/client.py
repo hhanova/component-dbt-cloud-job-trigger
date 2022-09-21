@@ -20,7 +20,7 @@ def store_artifact(artifact: str, file: dict) -> None:
     """
     cwd = Path(os.getcwd())
     root_dir = cwd.parent.absolute()
-    artifacts_dir = (os.path.join(root_dir, "data", "out", "artifacts"))
+    artifacts_dir = (os.path.join(root_dir, "data", "artifacts", "runs", "current"))
 
     if not os.path.exists(artifacts_dir):
         logging.info("Creating artifacts directory.")

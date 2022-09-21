@@ -55,7 +55,6 @@ class Component(ComponentBase):
             except TypeError:
                 self.max_wait_time = None
         self.wait_for_result = wait_for_result
-        print(wait_for_result)
 
     def run(self):
         """
