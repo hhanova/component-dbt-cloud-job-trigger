@@ -49,9 +49,13 @@ class Component(ComponentBase):
         self.job_id = params.get(JOB_ID)
         self.api_key = params.get(API_KEY)
         self.cause = params.get(CAUSE)
-        if wait_for_result := params.get(WAIT_FOR_RESULT) is not None:
-            self.max_wait_time = params.get(MAX_WAIT_TIME * 60)
+        if wait_for_result := params.get(WAIT_FOR_RESULT) is True:
+            try:
+                self.max_wait_time = params.get(MAX_WAIT_TIME * 60)
+            except TypeError:
+                self.max_wait_time = None
         self.wait_for_result = wait_for_result
+        print(wait_for_result)
 
     def run(self):
         """
