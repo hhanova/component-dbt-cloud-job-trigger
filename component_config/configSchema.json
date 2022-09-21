@@ -24,6 +24,7 @@
     "#api_key": {
       "type": "string",
       "title": "API Key",
+      "format": "password",
       "description": "API Key string, How to get one is explained <a href='https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html'>here</a>",
       "propertyOrder": 3
     },
