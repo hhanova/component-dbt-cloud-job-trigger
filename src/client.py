@@ -52,7 +52,8 @@ class DbtClient:
         """
         for artifact in ARTIFACTS:
             res = requests.get(
-                url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/artifacts/{artifact}",
+                url=f"https://cloud.getdbt.com/api/v2/accounts/"
+                    f"{self.account_id}/runs/{job_run_id}/artifacts/{artifact}",
                 headers=self.auth_headers
             )
             if res.status_code == 200:

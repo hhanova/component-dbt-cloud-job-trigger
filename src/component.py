@@ -2,8 +2,6 @@
 Template Component main class.
 inspired by:
 https://discourse.getdbt.com/t/triggering-a-dbt-cloud-job-in-your-automated-workflow-with-python/2573
-
-
 """
 import csv
 import logging

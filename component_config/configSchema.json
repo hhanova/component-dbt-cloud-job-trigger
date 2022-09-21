@@ -2,18 +2,49 @@
   "type": "object",
   "title": "extractor configuration",
   "required": [
-    "print_hello"
+    "account_id",
+    "job_id",
+    "#api_key",
+    "cause",
+    "wait_for_result"
   ],
   "properties": {
-    "print_hello": {
-      "type": "boolean",
-      "title": "Print Hello",
+    "account_id": {
+      "type": "integer",
+      "title": "Account ID",
+      "description": "Numeric ID of the account",
       "propertyOrder": 1
     },
-    "debug": {
-      "type": "boolean",
-      "title": "Debug",
+    "job_id": {
+      "type": "integer",
+      "title": "Job ID",
+      "description": "Numeric ID of the job",
       "propertyOrder": 2
+    },
+    "#api_key": {
+      "type": "string",
+      "title": "API Key",
+      "description": "API Key string, How to get one is explained <a href='https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html'>here</a>",
+      "propertyOrder": 3
+    },
+    "cause": {
+      "type": "string",
+      "title": "Cause",
+      "description": "String identifier which will be sent along with job trigger request.",
+      "propertyOrder": 4
+    },
+    "wait_for_result": {
+      "type": "boolean",
+      "title": "Wait for result",
+      "description": "Set to true if you want the component to wait until defined job finishes and then store artifacts.",
+      "propertyOrder": 5
+    },
+    "max_wait_time": {
+      "type": "integer",
+      "title": "Max wait time",
+      "description": "Max time to wait. Used only when parameter Wait for result is set to true.",
+      "propertyOrder": 6
     }
   }
 }
+
