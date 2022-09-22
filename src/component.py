@@ -123,7 +123,7 @@ class Component(ComponentBase):
         config_id = self.environment_variables.config_id
         if not config_id:
             config_id = "000000000"
-        bucket_name = f"in.c-testing-data-{config_id}"
+        bucket_name = f"in.c-dbt-cloud-job-trigger-{config_id}"
         return bucket_name
 
     def save_dict_to_csv(self, input_dct, filename):
