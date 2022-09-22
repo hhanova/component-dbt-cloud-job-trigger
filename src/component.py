@@ -90,7 +90,7 @@ class Component(ComponentBase):
         job_run_id = job_run_data['id']
         logging.info(f"Triggered Job Run ID: {job_run_id}")
 
-        self.save_dict_to_csv(job_run_data, "dbt_cloud_trigger.csv")
+        self.save_dict_to_csv(job_run_data, "dbt_cloud_trigger")
 
         if self.wait_for_result:
             start_time = time.time()
@@ -115,7 +115,7 @@ class Component(ComponentBase):
 
         status_data = client.get_job_run_status(job_run_id)
         run_data = assign_status_data(status_data)
-        self.save_dict_to_csv(run_data, "dbt_cloud_run.csv")
+        self.save_dict_to_csv(run_data, "dbt_cloud_run")
 
         logging.info("Component finished successfully.")
 
