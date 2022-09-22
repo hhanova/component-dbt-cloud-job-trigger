@@ -1,2 +1,3 @@
-Testing functional sample extractor for purposes of the python component template. 
-Implements partial Hubspot extractor using the public sandbox token.
+dbt Job trigger
+
+Triggers dbt Cloud job. Optionally, saves job info at trigger time and after the job is done.

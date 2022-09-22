@@ -5,11 +5,15 @@ https://discourse.getdbt.com/t/triggering-a-dbt-cloud-job-in-your-automated-work
 """
 import csv
 import logging
-from datetime import datetime
+import os
+import shutil
+import tarfile
 import time
+import enum
+from pathlib import Path
 
 from keboola.component.base import ComponentBase
-from helper import DbtJobRunStatus
+from mapping import assign_status_data
 from client import DbtClient
 
 from keboola.component.exceptions import UserException
@@ -28,6 +32,16 @@ REQUIRED_PARAMETERS = [ACCOUNT_ID, JOB_ID, API_KEY, CAUSE, WAIT_FOR_RESULT]
 REQUIRED_IMAGE_PARS = []
 
 
+# These are documented on the dbt Cloud API docs
+class DbtJobRunStatus(enum.IntEnum):
+    QUEUED = 1
+    STARTING = 2
+    RUNNING = 3
+    SUCCESS = 10
+    ERROR = 20
+    CANCELLED = 30
+
+
 class Component(ComponentBase):
     """
         Extends base class for general Python components. Initializes the CommonInterface
@@ -44,6 +58,7 @@ class Component(ComponentBase):
 
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
         params = self.configuration.parameters
+        self.output_bucket = self.get_bucket_name()
 
         self.account_id = params.get(ACCOUNT_ID)
         self.job_id = params.get(JOB_ID)
@@ -56,6 +71,11 @@ class Component(ComponentBase):
                 self.max_wait_time = None
         self.wait_for_result = wait_for_result
 
+        cwd = Path(os.getcwd())
+        root_dir = cwd.parent.absolute()
+        self.artifacts_dir = (os.path.join(root_dir, "data", "artifacts", "runs", "current"))
+        self.data_dir = (os.path.join(root_dir, "data"))
+
     def run(self):
         """
         Main execution code
@@ -66,19 +86,24 @@ class Component(ComponentBase):
                            api_key=self.api_key
                            )
 
-        job_run_id = client.trigger_job(cause=self.cause)
+        job_run_data = client.trigger_job(cause=self.cause)
+        job_run_id = job_run_data['id']
         logging.info(f"Triggered Job Run ID: {job_run_id}")
+
+        self.save_dict_to_csv(job_run_data, "dbt_cloud_trigger.csv")
 
         if self.wait_for_result:
             start_time = time.time()
             while True:
                 time.sleep(5)
 
-                status = client.get_job_run_status(job_run_id)
+                status = client.get_job_run_status(job_run_id)['data']['status']
                 logging.info(f"Job status = {DbtJobRunStatus(status).name}")
 
                 if status == DbtJobRunStatus.SUCCESS:
-                    client.get_artifacts(job_run_id)
+                    for artifact in client.list_available_artifacts(job_run_id):
+                        client.fetch_artifact(job_run_id, artifact)
+                    self.zip_and_move_artifacts(self.data_dir)
                     break
                 elif status == DbtJobRunStatus.ERROR or status == DbtJobRunStatus.CANCELLED:
                     raise UserException(f"Job with ID {job_run_id} has been stopped.")
@@ -88,18 +113,39 @@ class Component(ComponentBase):
                     if (time.time() - start_time) < self.max_wait_time:
                         raise UserException(f"Max wait time reached for Job with ID {job_run_id} - Exiting.")
 
-        table = self.create_out_table_definition("output.csv", incremental=True, primary_key=["job_run_id", "ts"])
+        status_data = client.get_job_run_status(job_run_id)
+        run_data = assign_status_data(status_data)
+        self.save_dict_to_csv(run_data, "dbt_cloud_run.csv")
 
-        # DO whatever and save into out_table_path
-        with open(table.full_path, mode="wt", encoding="utf-8", newline="") as out_file:
-            writer = csv.DictWriter(out_file, fieldnames=["job_run_id", "ts"])
-            writer.writeheader()
-            writer.writerow({
-                "job_run_id": job_run_id,
-                "ts": datetime.now().isoformat()
-            })
+        logging.info("Component finished successfully.")
 
+    def get_bucket_name(self) -> str:
+        config_id = self.environment_variables.config_id
+        if not config_id:
+            config_id = "000000000"
+        bucket_name = f"in.c-testing-data-{config_id}"
+        return bucket_name
+
+    def save_dict_to_csv(self, input_dct, filename):
+        table = self.create_out_table_definition(name=filename, incremental=True,
+                                                 destination=f"{self.output_bucket}.{filename}")
+        with open(table.full_path, mode="w", encoding="utf-8", newline="") as f:
+            w = csv.DictWriter(f, input_dct.keys())
+            w.writeheader()
+            w.writerow(input_dct)
         self.write_manifest(table)
+
+    def zip_and_move_artifacts(self, source_dir):
+        temp_filepath = os.path.join(source_dir, "artifacts.tar.gz")
+        with tarfile.open(temp_filepath, "w:gz") as tar:
+            tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+        if not os.path.exists(self.artifacts_dir):
+            logging.info("Creating artifacts directory.")
+            os.makedirs(self.artifacts_dir)
+
+        print(f"Moving from: {temp_filepath} to {os.path.join(self.artifacts_dir,'artifacts.tar.gz')}")
+        # shutil.move(temp_filepath, os.path.join(self.artifacts_dir, "artifacts.tar.gz"))
 
 
 """

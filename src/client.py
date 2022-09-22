@@ -1,35 +1,11 @@
 import requests
-import json
 import os
 from pathlib import Path
 import logging
 
+
 from requests.exceptions import HTTPError
 from keboola.component.exceptions import UserException
-
-
-ARTIFACTS = ["manifest.json", "catalog.json", "run_results.json"]
-
-
-def store_artifact(artifact: str, file: dict) -> None:
-    """
-    Stores file in data/out/artifacts folder
-    Args:
-        artifact: filename
-        file: Dictionary with json content to be stored
-    """
-    cwd = Path(os.getcwd())
-    root_dir = cwd.parent.absolute()
-    artifacts_dir = (os.path.join(root_dir, "data", "artifacts", "runs", "current"))
-
-    if not os.path.exists(artifacts_dir):
-        logging.info("Creating artifacts directory.")
-        os.makedirs(artifacts_dir)
-
-    full_path = os.path.join(artifacts_dir, artifact)
-
-    with open(full_path, "w") as f:
-        json.dump(file, f)
 
 
 class DbtClient:
@@ -44,26 +20,48 @@ class DbtClient:
 
         self.auth_headers = {'Authorization': f"Token {api_key}"}
 
-    def get_artifacts(self, job_run_id: int) -> None:
+    def fetch_artifact(self, job_run_id: int, artifact: str) -> None:
         """
-        Gets available artifacts and stores them in artifacts folder.
+        Gets available artifacts and stores them in temp folder.
         Args:
+            artifact: Path to artifact
             job_run_id: Job run ID
         """
-        for artifact in ARTIFACTS:
-            res = requests.get(
-                url=f"https://cloud.getdbt.com/api/v2/accounts/"
-                    f"{self.account_id}/runs/{job_run_id}/artifacts/{artifact}",
-                headers=self.auth_headers
-            )
-            if res.status_code == 200:
-                store_artifact(artifact, res.json())
-            else:
-                logging.warning(f"Cannot save {artifact}: {res.text}")
+        res = requests.get(
+            url=f"https://cloud.getdbt.com/api/v2/accounts/"
+                f"{self.account_id}/runs/{job_run_id}/artifacts/{artifact}",
+            headers=self.auth_headers
+        )
+        if res.status_code == 200:
+            self.store_artifact(artifact, res.text)
+        else:
+            logging.warning(f"Cannot save {artifact}: {res.text}")
 
-    def trigger_job(self, cause: str) -> int:
+    @staticmethod
+    def store_artifact(artifact: str, file: str) -> None:
         """
-        Triggers
+        Stores file in data/temp folder
+        Args:
+            artifact: filename
+            file: string content to be stored
+        """
+        cwd = Path(os.getcwd())
+        root_dir = cwd.parent.absolute()
+        temp_dir = (os.path.join(root_dir, "data", "temp"))
+
+        full_path = Path(os.path.join(temp_dir, artifact))
+        parent_dir = full_path.parent.absolute()
+        if not os.path.exists(parent_dir):
+            os.makedirs(parent_dir)
+
+        with open(full_path, "w") as f:
+            f.write(file)
+
+    def trigger_job(self, cause: str) -> dict:
+        """
+        Triggers the dbt job.
+        Returns dictionary with data field from response.
+
         Args:
             cause: String identifier which will be sent along with job trigger request.
         """
@@ -84,11 +82,11 @@ class DbtClient:
             raise UserException(f"Encountered Error when triggering job: {res.text}")
 
         response_payload = res.json()
-        return response_payload['data']['id']
+        return response_payload['data']
 
-    def get_job_run_status(self, job_run_id: int) -> int:
+    def get_job_run_status(self, job_run_id: int) -> dict:
         """
-        Fetches Job run status code.
+        Fetches Dictionary with job status.
         Args:
             job_run_id: Job run ID
         """
@@ -99,4 +97,14 @@ class DbtClient:
 
         res.raise_for_status()
         response_payload = res.json()
-        return response_payload['data']['status']
+        return response_payload
+
+    def list_available_artifacts(self, job_run_id: int) -> list:
+        res = requests.get(
+            url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/artifacts/",
+            headers={'Authorization': f"Token {self.api_key}"},
+        )
+
+        res.raise_for_status()
+        response_payload = res.json()
+        return response_payload["data"]
