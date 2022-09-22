@@ -95,7 +95,7 @@ class Component(ComponentBase):
         if self.wait_for_result:
             start_time = time.time()
             while True:
-                time.sleep(15)
+                time.sleep(30)
 
                 status = client.get_job_run_status(job_run_id)['data']['status']
                 logging.info(f"Job status = {DbtJobRunStatus(status).name}")
