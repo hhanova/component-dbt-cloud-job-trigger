@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 import logging
 
-
 from requests.exceptions import HTTPError
 from keboola.component.exceptions import UserException
 
