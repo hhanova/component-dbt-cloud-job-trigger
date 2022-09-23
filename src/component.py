@@ -6,8 +6,6 @@ https://discourse.getdbt.com/t/triggering-a-dbt-cloud-job-in-your-automated-work
 import csv
 import logging
 import os
-import shutil
-import tarfile
 import time
 import enum
 from pathlib import Path
@@ -73,7 +71,7 @@ class Component(ComponentBase):
 
         cwd = Path(os.getcwd())
         root_dir = cwd.parent.absolute()
-        self.artifacts_dir = (os.path.join(root_dir, "data", "artifacts", "out", "current"))
+        self.artifacts_dir = os.path.join(root_dir, "data", "artifacts", "out", "current")
         self.data_dir = (os.path.join(root_dir, "data"))
 
     def run(self):
@@ -103,7 +101,6 @@ class Component(ComponentBase):
                 if status == DbtJobRunStatus.SUCCESS:
                     for artifact in client.list_available_artifacts(job_run_id):
                         client.fetch_artifact(job_run_id, artifact)
-                    self.zip_and_move_artifacts()
                     break
                 elif status == DbtJobRunStatus.ERROR or status == DbtJobRunStatus.CANCELLED:
                     raise UserException(f"Job with ID {job_run_id} has been stopped.")
@@ -135,22 +132,6 @@ class Component(ComponentBase):
             w.writerow(input_dct)
         self.write_manifest(table)
 
-    def zip_and_move_artifacts(self):
-
-        temp_filepath = os.path.join(self.data_dir, "artifacts.tar.gz")
-        with tarfile.open(temp_filepath, "w:gz") as tar:
-            tar.add(self.data_dir, arcname=os.path.basename(self.data_dir))
-
-        if not os.path.exists(self.artifacts_dir):
-            logging.info("Creating artifacts directory.")
-            os.makedirs(self.artifacts_dir)
-
-        # remove temp directory
-        temp_dir = os.path.join(self.data_dir, "temp")
-        if os.path.exists(temp_dir):
-            shutil.rmtree(temp_dir)
-
-        shutil.move(temp_filepath, os.path.join(self.artifacts_dir, "artifacts.tar.gz"))
 
 
 """

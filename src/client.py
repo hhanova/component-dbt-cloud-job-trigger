@@ -46,7 +46,7 @@ class DbtClient:
         """
         cwd = Path(os.getcwd())
         root_dir = cwd.parent.absolute()
-        temp_dir = (os.path.join(root_dir, "data", "temp"))
+        temp_dir = os.path.join(root_dir, "data", "artifacts", "out", "current")
 
         full_path = Path(os.path.join(temp_dir, artifact))
         parent_dir = full_path.parent.absolute()
