@@ -73,7 +73,7 @@ class Component(ComponentBase):
 
         cwd = Path(os.getcwd())
         root_dir = cwd.parent.absolute()
-        self.artifacts_dir = (os.path.join(root_dir, "data", "artifacts", "current"))
+        self.artifacts_dir = (os.path.join(root_dir, "data", "artifacts", "out", "current"))
         self.data_dir = (os.path.join(root_dir, "data"))
 
     def run(self):
