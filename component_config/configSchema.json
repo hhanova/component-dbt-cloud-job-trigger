@@ -43,6 +43,7 @@
     "max_wait_time": {
       "type": "integer",
       "title": "Max wait time",
+      "default": 60,
       "description": "Max time to wait. Used only when parameter Wait for result is set to true.",
       "propertyOrder": 6
     }
