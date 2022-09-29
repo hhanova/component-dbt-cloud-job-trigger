@@ -44,6 +44,7 @@ Configuration
   
 Sample Configuration  
 =============  
+
 ```json  
 {  
  "parameters": { "account_id": 949, "job_id": 121341, "#api_key": "SECRET_VALUE", "cause": "Job triggered from Keboola", "wait_for_result": true }, "action": "run"}  
@@ -56,6 +57,7 @@ Output
 **Tables:**
 
 in.c-dbt-cloud-job-trigger-{config_id}.dbt_cloud_trigger
+
 in.c-dbt-cloud-job-trigger-{config_id}.dbt_cloud_run
 
 **Artifacts:**
@@ -63,7 +65,7 @@ in.c-dbt-cloud-job-trigger-{config_id}.dbt_cloud_run
 Saves all artifacts from https://docs.getdbt.com/dbt-cloud/api-v2#tag/Runs/operation/getArtifactsByRunId into Keboola storage.
 
 Development  
------------  
+====== 
   
 If required, change local data folder (the `CUSTOM_FOLDER` placeholder) path to your custom path in  
 the `docker-compose.yml` file:  
