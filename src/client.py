@@ -78,6 +78,9 @@ class DbtClient:
         try:
             res.raise_for_status()
         except HTTPError:
+            if res.json()["status"]["user_message"] == "Invalid token.":
+                raise UserException("""Invalid API key has been set, job could not be triggered. Make sure your API 
+                key is valid and re-enter it into the component configuration.""")
             raise UserException(f"Encountered Error when triggering job: {res.text}")
 
         response_payload = res.json()
@@ -94,7 +97,11 @@ class DbtClient:
             headers=self.auth_headers,
         )
 
-        res.raise_for_status()
+        try:
+            res.raise_for_status()
+        except HTTPError:
+            raise UserException(f"Encountered Error when triggering job: {res.text}")
+
         response_payload = res.json()
         return response_payload
 
@@ -104,6 +111,10 @@ class DbtClient:
             headers={'Authorization': f"Token {self.api_key}"},
         )
 
-        res.raise_for_status()
+        try:
+            res.raise_for_status()
+        except HTTPError:
+            raise UserException(f"Encountered Error when triggering job: {res.text}")
+
         response_payload = res.json()
         return response_payload["data"]
