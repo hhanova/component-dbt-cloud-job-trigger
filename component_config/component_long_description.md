@@ -1,7 +1,16 @@
-### extractor configuration  
- - Account ID (account_id) - [REQ] Numeric ID of the account  
- - Job ID (job_id) - [REQ] Numeric ID of the job  
- - API Key (#api_key) - [REQ] API Key string, How to get one is explained <a href='https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html'>here</a>  
- - Cause (cause) - [REQ] String identifier which will be sent along with job trigger request.  
- - Wait for result (wait_for_result) - [REQ] Set to true if you want the component to wait until defined job finishes and then store artifacts.  
- - Max wait time (max_wait_time) - [OPT] Max time to wait. Used only when parameter Wait for result is set to true.  
+
+  
+Requirements:
+
+ - API key
+ - Account ID
+ - Job ID
+
+Tables (data is going to be imported incrementally):  
+ - in.c-dbt-cloud-job-trigger-{config_id}.dbt_cloud_trigger - response from [api-v2#tag/Jobs/operation/triggerRun](https://docs.getdbt.com/dbt-cloud/api-v2#tag/Jobs/operation/triggerRun)
+ - in.c-dbt-cloud-job-trigger-{config_id}.dbt_cloud_run - response from [api-v2#tag/Runs/operation/getRunById](https://docs.getdbt.com/dbt-cloud/api-v2#tag/Runs/operation/getRunById)
+
+Artifacts:  
+
+Saves all artifacts from https://docs.getdbt.com/dbt-cloud/api-v2#tag/Runs/operation/getArtifactsByRunId into Keboola storage.
+

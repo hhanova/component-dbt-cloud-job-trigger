@@ -1,1 +1,1 @@
-dbt job trigger
+dbt is a data transformation tool that enables data analysts and engineers to transform, test and document data in the cloud data warehouse.
