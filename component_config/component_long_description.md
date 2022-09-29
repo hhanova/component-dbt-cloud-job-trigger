@@ -1,4 +1,4 @@
-###extractor configuration  
+### extractor configuration  
  - Account ID (account_id) - [REQ] Numeric ID of the account  
  - Job ID (job_id) - [REQ] Numeric ID of the job  
  - API Key (#api_key) - [REQ] API Key string, How to get one is explained <a href='https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html'>here</a>  
