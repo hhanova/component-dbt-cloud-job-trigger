@@ -79,7 +79,7 @@ class DbtClient:
             res.raise_for_status()
         except HTTPError:
             if res.json()["status"]["user_message"] == "Invalid token.":
-                raise UserException("""Invalid API key has been set, job could not be triggered. Make sure your API 
+                raise UserException("""Invalid API key has been set, job could not be triggered. Make sure your API
                 key is valid and re-enter it into the component configuration.""")
             raise UserException(f"Encountered Error when triggering job: {res.text}")
 
