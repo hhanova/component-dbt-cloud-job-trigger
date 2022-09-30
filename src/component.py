@@ -62,7 +62,7 @@ class Component(ComponentBase):
         self.job_id = params.get(JOB_ID)
         self.api_key = params.get(API_KEY)
         if self.api_key == "":
-            raise UserException(f"API key cannot be empty.")
+            raise UserException("API key cannot be empty.")
         self.cause = params.get(CAUSE)
         if wait_for_result := params.get(WAIT_FOR_RESULT) is True:
             try:
