@@ -25,7 +25,7 @@
       "type": "string",
       "title": "API Key",
       "format": "password",
-      "description": "API Key string, How to get one is explained <a href='https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html'>here</a>",
+      "description": "API Key string, How to get one is explained <a href='https://docs.getdbt.com/docs/dbt-cloud/dbt-cloud-api/user-tokens'>here</a>",
       "propertyOrder": 3
     },
     "cause": {
@@ -36,9 +36,9 @@
       "propertyOrder": 4
     },
     "wait_for_result": {
-      "type": "boolean",
+      "type": "checkbox",
       "title": "Wait for result",
-      "description": "Set to true if you want the component to wait until defined job finishes and then store artifacts.",
+      "description": "Select this if you want the component to wait until defined job finishes and then store artifacts.",
       "propertyOrder": 5
     },
     "max_wait_time": {
@@ -55,4 +55,3 @@
     }
   }
 }
-
