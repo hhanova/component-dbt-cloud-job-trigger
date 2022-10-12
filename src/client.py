@@ -33,6 +33,7 @@ class DbtClient:
         )
         if res.status_code == 200:
             self.store_artifact(artifact, res.text)
+            logging.info(f"Stored artifact: {artifact}")
         else:
             logging.warning(f"Cannot save {artifact}: {res.text}")
 

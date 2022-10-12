@@ -9,11 +9,12 @@
     "wait_for_result"
   ],
   "properties": {
-    "account_id": {
-      "type": "integer",
-      "title": "Account ID",
-      "description": "Numeric ID of the account",
-      "propertyOrder": 1
+    "cause": {
+      "type": "string",
+      "title": "Cause",
+      "default": "Triggered from Keboola",
+      "description": "String identifier which will be sent along with job trigger request.",
+      "propertyOrder": 4
     },
     "job_id": {
       "type": "integer",
@@ -28,30 +29,30 @@
       "description": "API Key string, How to get one is explained <a href='https://docs.getdbt.com/docs/dbt-cloud/dbt-cloud-api/user-tokens'>here</a>",
       "propertyOrder": 3
     },
-    "cause": {
-      "type": "string",
-      "title": "Cause",
-      "default": "Triggered from Keboola",
-      "description": "String identifier which will be sent along with job trigger request.",
-      "propertyOrder": 4
-    },
-    "wait_for_result": {
-      "type": "checkbox",
-      "title": "Wait for result",
-      "description": "Select this if you want the component to wait until defined job finishes and then store artifacts.",
-      "propertyOrder": 5
+    "account_id": {
+      "type": "integer",
+      "title": "Account ID",
+      "description": "Numeric ID of the account",
+      "propertyOrder": 1
     },
     "max_wait_time": {
       "type": "integer",
       "title": "Max wait time",
       "default": 60,
-      "description": "Max time to wait. Used only when parameter Wait for result is set to true.",
       "options": {
         "dependencies": {
           "wait_for_result": true
         }
       },
+      "description": "Max time to wait. Used only when parameter Wait for result is set to true.",
       "propertyOrder": 6
+    },
+    "wait_for_result": {
+      "type": "boolean",
+      "format": "checkbox",
+      "title": "Wait for result",
+      "description": "Select this if you want the component to wait until defined job finishes and then store artifacts.",
+      "propertyOrder": 5
     }
   }
 }
