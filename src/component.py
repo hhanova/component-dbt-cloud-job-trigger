@@ -64,7 +64,7 @@ class Component(ComponentBase):
         if self.api_key == "":
             raise UserException("API key cannot be empty.")
         self.cause = params.get(CAUSE)
-        if wait_for_result := params.get(WAIT_FOR_RESULT) is True:
+        if wait_for_result := params.get(WAIT_FOR_RESULT):
             try:
                 self.max_wait_time = params.get(MAX_WAIT_TIME * 60)
             except TypeError:
@@ -97,15 +97,19 @@ class Component(ComponentBase):
             while True:
                 time.sleep(30)
 
-                status = client.get_job_run_status(job_run_id)['data']['status']
+                data = client.get_job_run_status(job_run_id, get_steps=True)['data']
+                status = data['status']
                 logging.info(f"Job status = {DbtJobRunStatus(status).name}")
 
                 if status == DbtJobRunStatus.SUCCESS:
                     for artifact in client.list_available_artifacts(job_run_id):
                         client.fetch_artifact(job_run_id, artifact)
                     break
-                elif status == DbtJobRunStatus.ERROR or status == DbtJobRunStatus.CANCELLED:
-                    raise UserException(f"Job with ID {job_run_id} has been stopped.")
+                elif status == DbtJobRunStatus.ERROR:
+                    raise UserException(f"Job with ID {job_run_id} has been stopped."
+                                        f"Run steps: {data['run_steps']}")
+                elif status == DbtJobRunStatus.CANCELLED:
+                    raise UserException(f"Job with ID {job_run_id} has been canceled by user.")
 
                 # Stop waiting if runtime is greater than MAX_WAIT_TIME (minutes)
                 if self.max_wait_time:

@@ -87,15 +87,17 @@ class DbtClient:
         response_payload = res.json()
         return response_payload['data']
 
-    def get_job_run_status(self, job_run_id: int) -> dict:
+    def get_job_run_status(self, job_run_id: int, get_steps=False) -> dict:
         """
         Fetches Dictionary with job status.
         Args:
             job_run_id: Job run ID
+            get_steps: if set to True, gets additional job run data
         """
         res = requests.get(
             url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/",
             headers=self.auth_headers,
+            params='include_related=["run_steps", "job"]' if get_steps else ""
         )
 
         try:
@@ -103,8 +105,7 @@ class DbtClient:
         except HTTPError:
             raise UserException(f"Encountered Error when triggering job: {res.text}")
 
-        response_payload = res.json()
-        return response_payload
+        return res.json()
 
     def list_available_artifacts(self, job_run_id: int) -> list:
         res = requests.get(
