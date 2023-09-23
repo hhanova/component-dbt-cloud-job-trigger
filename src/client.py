@@ -113,7 +113,7 @@ class DbtClient:
         try:
             res.raise_for_status()
         except HTTPError:
-            raise UserException(f"Encountered Error when triggering job: {res.text}")
+            raise UserException(f"Encountered Error when getting job artifacts: {res.text}")
 
         response_payload = res.json()
         return response_payload["data"]
