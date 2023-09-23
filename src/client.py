@@ -90,6 +90,12 @@ class DbtClient:
 
     @backoff.on_exception(backoff.expo, HTTPError, max_tries=3, factor=2)
     def get_job_run_status(self, job_run_id: int, get_steps=False) -> dict:
+        """
+        Fetches Dictionary with job status.
+        Args:
+            job_run_id: Job run ID
+            get_steps: if set to True, gets additional job run data
+        """
         res = requests.get(
             url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/",
             headers=self.auth_headers,
