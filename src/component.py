@@ -116,7 +116,6 @@ class Component(ComponentBase):
                     if (time.time() - start_time) < self.max_wait_time:
                         raise UserException(f"Max wait time reached for Job with ID {job_run_id} - Exiting.")
 
-
         status_data = client.get_job_run_status(job_run_id)
         run_data = assign_status_data(status_data)
         self.save_dict_to_csv(run_data, "dbt_cloud_run")
