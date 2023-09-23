@@ -96,10 +96,14 @@ class DbtClient:
             params='include_related=["run_steps", "job"]' if get_steps else ""
         )
 
-        res.raise_for_status()
+        try:
+            res.raise_for_status()
+        except HTTPError:
+            raise UserException(f"Encountered Error when getting job status: {res.text}")
 
         return res.json()
 
+    @backoff.on_exception(backoff.expo, HTTPError, max_tries=3, factor=2)
     def list_available_artifacts(self, job_run_id: int) -> list:
         res = requests.get(
             url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/artifacts/",
