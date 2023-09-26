@@ -1,3 +1,4 @@
+import backoff
 import requests
 import os
 from pathlib import Path
@@ -87,6 +88,7 @@ class DbtClient:
         response_payload = res.json()
         return response_payload['data']
 
+    @backoff.on_exception(backoff.expo, HTTPError, max_tries=3, factor=2)
     def get_job_run_status(self, job_run_id: int, get_steps=False) -> dict:
         """
         Fetches Dictionary with job status.
@@ -100,23 +102,17 @@ class DbtClient:
             params='include_related=["run_steps", "job"]' if get_steps else ""
         )
 
-        try:
-            res.raise_for_status()
-        except HTTPError:
-            raise UserException(f"Encountered Error when triggering job: {res.text}")
+        res.raise_for_status()
 
         return res.json()
 
+    @backoff.on_exception(backoff.expo, HTTPError, max_tries=3, factor=2)
     def list_available_artifacts(self, job_run_id: int) -> list:
         res = requests.get(
             url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/artifacts/",
             headers={'Authorization': f"Token {self.api_key}"},
         )
 
-        try:
-            res.raise_for_status()
-        except HTTPError:
-            raise UserException(f"Encountered Error when triggering job: {res.text}")
+        res.raise_for_status()
 
-        response_payload = res.json()
-        return response_payload["data"]
+        return res.json().get("data")
