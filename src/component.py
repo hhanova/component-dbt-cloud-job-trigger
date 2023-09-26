@@ -144,7 +144,7 @@ class Component(ComponentBase):
         self.write_manifest(table)
 
     @staticmethod
-    def _list_available_artifacts(client, job_run_id):
+    def _list_available_artifacts(client, job_run_id) -> list:
         try:
             return client.list_available_artifacts(job_run_id)
         except HTTPError as e:
