@@ -157,6 +157,7 @@ class Component(ComponentBase):
         except HTTPError as e:
             raise UserException(f"Encountered Error when getting job status: {e}") from e
 
+
 """
         Main entrypoint
 """
