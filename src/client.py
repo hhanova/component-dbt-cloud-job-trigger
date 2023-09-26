@@ -102,10 +102,7 @@ class DbtClient:
             params='include_related=["run_steps", "job"]' if get_steps else ""
         )
 
-        try:
-            res.raise_for_status()
-        except HTTPError:
-            raise UserException(f"Encountered Error when getting job status: {res.text}")
+        res.raise_for_status()
 
         return res.json()
 
@@ -116,10 +113,6 @@ class DbtClient:
             headers={'Authorization': f"Token {self.api_key}"},
         )
 
-        try:
-            res.raise_for_status()
-        except HTTPError:
-            raise UserException(f"Encountered Error when getting job artifacts: {res.text}")
+        res.raise_for_status()
 
-        response_payload = res.json()
-        return response_payload["data"]
+        return res.json().get("data")

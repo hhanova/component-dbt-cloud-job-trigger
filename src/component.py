@@ -8,6 +8,7 @@ import logging
 import os
 import time
 import enum
+from requests.exceptions import HTTPError
 from pathlib import Path
 
 from keboola.component.base import ComponentBase
@@ -97,12 +98,16 @@ class Component(ComponentBase):
             while True:
                 time.sleep(30)
 
-                data = client.get_job_run_status(job_run_id, get_steps=True)['data']
+                try:
+                    data = self._get_job_run_status(client, job_run_id, get_steps=True)['data']
+                except HTTPError as e:
+                    raise UserException(f"Encountered Error when getting job status: {e}") from e
+
                 status = data['status']
                 logging.info(f"Job status = {DbtJobRunStatus(status).name}")
 
                 if status == DbtJobRunStatus.SUCCESS:
-                    for artifact in client.list_available_artifacts(job_run_id):
+                    for artifact in self._list_available_artifacts(client, job_run_id):
                         client.fetch_artifact(job_run_id, artifact)
                     break
                 elif status == DbtJobRunStatus.ERROR:
@@ -116,7 +121,7 @@ class Component(ComponentBase):
                     if (time.time() - start_time) < self.max_wait_time:
                         raise UserException(f"Max wait time reached for Job with ID {job_run_id} - Exiting.")
 
-        status_data = client.get_job_run_status(job_run_id)
+        status_data = self._get_job_run_status(client, job_run_id)
         run_data = assign_status_data(status_data)
         self.save_dict_to_csv(run_data, "dbt_cloud_run")
 
@@ -138,6 +143,19 @@ class Component(ComponentBase):
             w.writerow(input_dct)
         self.write_manifest(table)
 
+    @staticmethod
+    def _list_available_artifacts(client, job_run_id):
+        try:
+            return client.list_available_artifacts(job_run_id)
+        except HTTPError as e:
+            raise UserException(f"Encountered Error when getting job artifacts: {e}") from e
+
+    @staticmethod
+    def _get_job_run_status(client, job_run_id: int, get_steps=False) -> dict:
+        try:
+            return client.get_job_run_status(job_run_id, get_steps)
+        except HTTPError as e:
+            raise UserException(f"Encountered Error when getting job status: {e}") from e
 
 """
         Main entrypoint
