@@ -89,7 +89,8 @@ class Component(ComponentBase):
 
         job_run_data = client.trigger_job(cause=self.cause)
         job_run_id = job_run_data['id']
-        logging.info(f"Triggered Job Run ID: {job_run_id}")
+        job_run_url = job_run_data['href']
+        logging.warning(f'Run triggered: {job_run_url}')
 
         self.save_dict_to_csv(job_run_data, "dbt_cloud_trigger")
 
