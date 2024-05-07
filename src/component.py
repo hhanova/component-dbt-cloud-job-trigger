@@ -12,7 +12,7 @@ from requests.exceptions import HTTPError
 from pathlib import Path
 
 from keboola.component.base import ComponentBase
-from mapping import assign_status_data
+from mapping import assign_status_data, assign_trigger_data
 from client import DbtClient
 
 from keboola.component.exceptions import UserException
@@ -92,7 +92,8 @@ class Component(ComponentBase):
         job_run_url = job_run_data['href']
         logging.warning(f'Run triggered: {job_run_url}')
 
-        self.save_dict_to_csv(job_run_data, "dbt_cloud_trigger")
+        trigger_data = assign_trigger_data(job_run_data)
+        self.save_dict_to_csv(trigger_data, "dbt_cloud_trigger")
 
         if self.wait_for_result:
             start_time = time.time()
