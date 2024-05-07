@@ -1,4 +1,5 @@
-def assign_status_data(data):
+def assign_status_data(job_run_data: dict):
+    data = job_run_data.get("data", {})
     return {
         "id": data.get("id"),
         "trigger_id": data.get("trigger_id"),
