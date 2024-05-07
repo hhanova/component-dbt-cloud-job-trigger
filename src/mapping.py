@@ -36,9 +36,6 @@ def assign_status_data(data):
 
 
 def assign_trigger_data(data):
-    trigger = data.get('trigger', {})
-    job = data.get('job', {})
-
     return {
         "id": data.get("id"),
         "trigger_id": data.get("trigger_id"),
@@ -68,8 +65,8 @@ def assign_trigger_data(data):
         "last_checked_at": data.get("last_checked_at"),
         "last_heartbeat_at": data.get("last_heartbeat_at"),
         "should_start_at": data.get("should_start_at"),
-        "trigger": trigger,
-        "job": job,
+        "trigger": data.get("trigger", {}),
+        "job": data.get("job", {}),
         "environment": data.get("environment"),
         "run_steps": data.get("run_steps"),
         "status_humanized": data.get("status_humanized"),
