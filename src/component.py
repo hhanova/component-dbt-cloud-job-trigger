@@ -26,6 +26,8 @@ WAIT_FOR_RESULT = "wait_for_result"
 MAX_WAIT_TIME = "max_wait_time"
 BASE_URL = "dbt_cloud_url"
 
+DEFAULT_BASE_URL = "https://cloud.getdbt.com"
+
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
 REQUIRED_PARAMETERS = [ACCOUNT_ID, JOB_ID, API_KEY, CAUSE, WAIT_FOR_RESULT]
@@ -63,7 +65,8 @@ class Component(ComponentBase):
         self.account_id = params.get(ACCOUNT_ID)
         self.job_id = params.get(JOB_ID)
         self.api_key = params.get(API_KEY)
-        self.base_url = self.check_base_url(params.get(BASE_URL))
+        base_url = params.get(BASE_URL)
+        self.base_url = self.check_base_url(base_url) if base_url else DEFAULT_BASE_URL
         if self.api_key == "":
             raise UserException("API key cannot be empty.")
         self.cause = params.get(CAUSE)
@@ -134,22 +137,11 @@ class Component(ComponentBase):
 
     @staticmethod
     def check_base_url(base_url):
-        if not base_url:
-            return base_url
-
-        # check empty string and space
-        if not base_url or base_url.isspace():
-            return None
-
         # check if base url starts with https
-        if not (base_url.startswith("https://") or base_url.startswith("http://")):
+        if not base_url.startswith(("https://", "http://")):
             base_url = f"https://{base_url}"
 
-        # check if last character is not /
-        if base_url.endswith("/"):
-            base_url = base_url[:-1]
-
-        return base_url
+        return base_url.rstrip('/')
 
     def get_bucket_name(self) -> str:
         config_id = self.environment_variables.config_id

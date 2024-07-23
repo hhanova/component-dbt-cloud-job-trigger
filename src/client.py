@@ -7,8 +7,6 @@ import logging
 from requests.exceptions import HTTPError
 from keboola.component.exceptions import UserException
 
-DEFAULT_BASE_URL = "https://cloud.getdbt.com"
-
 
 class DbtClient:
 
@@ -16,7 +14,7 @@ class DbtClient:
         self.account_id = account_id
         self.job_id = job_id
         self.api_key = api_key
-        self.base_url = base_url if base_url else DEFAULT_BASE_URL
+        self.base_url = base_url
 
         self.auth_headers = {'Authorization': f"Token {api_key}"}
 
