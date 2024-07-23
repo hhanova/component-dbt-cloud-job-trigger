@@ -134,12 +134,15 @@ class Component(ComponentBase):
 
     @staticmethod
     def check_base_url(base_url):
+        if not base_url:
+            return base_url
+
         # check empty string and space
         if not base_url or base_url.isspace():
-            base_url = None
+            return None
 
         # check if base url starts with https
-        if not base_url.startswith("https://") or not base_url.startswith("http://"):
+        if not (base_url.startswith("https://") or base_url.startswith("http://")):
             base_url = f"https://{base_url}"
 
         # check if last character is not /

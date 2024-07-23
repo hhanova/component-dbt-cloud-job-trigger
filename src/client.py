@@ -12,11 +12,11 @@ DEFAULT_BASE_URL = "https://cloud.getdbt.com"
 
 class DbtClient:
 
-    def __init__(self, account_id, job_id, api_key, base_url=DEFAULT_BASE_URL):
+    def __init__(self, account_id, job_id, api_key, base_url):
         self.account_id = account_id
         self.job_id = job_id
         self.api_key = api_key
-        self.base_url = base_url
+        self.base_url = base_url if base_url else DEFAULT_BASE_URL
 
         self.auth_headers = {'Authorization': f"Token {api_key}"}
 
