@@ -139,7 +139,7 @@ class Component(ComponentBase):
             base_url = None
 
         # check if base url starts with https
-        if not base_url.startswith("https://"):
+        if not base_url.startswith("https://") or not base_url.startswith("http://"):
             base_url = f"https://{base_url}"
 
         # check if last character is not /
