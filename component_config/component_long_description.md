@@ -4,6 +4,10 @@ Requirements:
  - Account ID
  - Job ID
 
+Optional:
+
+ - DBT Cloud URL
+
 #### Output
 
 Tables (data is going to be imported incrementally):  
