@@ -24,6 +24,9 @@ API_KEY = "#api_key"
 CAUSE = "cause"
 WAIT_FOR_RESULT = "wait_for_result"
 MAX_WAIT_TIME = "max_wait_time"
+BASE_URL = "dbt_cloud_url"
+
+DEFAULT_BASE_URL = "https://cloud.getdbt.com"
 
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
@@ -62,6 +65,8 @@ class Component(ComponentBase):
         self.account_id = params.get(ACCOUNT_ID)
         self.job_id = params.get(JOB_ID)
         self.api_key = params.get(API_KEY)
+        base_url = params.get(BASE_URL)
+        self.base_url = self.check_base_url(base_url) if base_url else DEFAULT_BASE_URL
         if self.api_key == "":
             raise UserException("API key cannot be empty.")
         self.cause = params.get(CAUSE)
@@ -84,7 +89,8 @@ class Component(ComponentBase):
 
         client = DbtClient(account_id=self.account_id,
                            job_id=self.job_id,
-                           api_key=self.api_key
+                           api_key=self.api_key,
+                           base_url=self.base_url
                            )
 
         job_run_data = client.trigger_job(cause=self.cause)
@@ -128,6 +134,14 @@ class Component(ComponentBase):
         self.save_dict_to_csv(run_data, "dbt_cloud_run")
 
         logging.info("Component finished successfully.")
+
+    @staticmethod
+    def check_base_url(base_url):
+        # check if base url starts with https
+        if not base_url.startswith(("https://", "http://")):
+            base_url = f"https://{base_url}"
+
+        return base_url.rstrip('/')
 
     def get_bucket_name(self) -> str:
         config_id = self.environment_variables.config_id

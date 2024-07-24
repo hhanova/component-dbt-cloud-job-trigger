@@ -10,13 +10,11 @@ from keboola.component.exceptions import UserException
 
 class DbtClient:
 
-    def __init__(self, account_id,
-                 job_id,
-                 api_key
-                 ):
+    def __init__(self, account_id, job_id, api_key, base_url):
         self.account_id = account_id
         self.job_id = job_id
         self.api_key = api_key
+        self.base_url = base_url
 
         self.auth_headers = {'Authorization': f"Token {api_key}"}
 
@@ -28,8 +26,7 @@ class DbtClient:
             job_run_id: Job run ID
         """
         res = requests.get(
-            url=f"https://cloud.getdbt.com/api/v2/accounts/"
-                f"{self.account_id}/runs/{job_run_id}/artifacts/{artifact}",
+            url=f"{self.base_url}/api/v2/accounts/{self.account_id}/runs/{job_run_id}/artifacts/{artifact}",
             headers=self.auth_headers
         )
         if res.status_code == 200:
@@ -67,7 +64,7 @@ class DbtClient:
             cause: String identifier which will be sent along with job trigger request.
         """
         res = requests.post(
-            url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/jobs/{self.job_id}/run/",
+            url=f"{self.base_url}/api/v2/accounts/{self.account_id}/jobs/{self.job_id}/run/",
             headers=self.auth_headers,
             json={
                 # Optionally pass a description that can be viewed within the dbt Cloud API.
@@ -97,7 +94,7 @@ class DbtClient:
             get_steps: if set to True, gets additional job run data
         """
         res = requests.get(
-            url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/",
+            url=f"{self.base_url}/api/v2/accounts/{self.account_id}/runs/{job_run_id}/",
             headers=self.auth_headers,
             params='include_related=["run_steps", "job"]' if get_steps else ""
         )
@@ -109,7 +106,7 @@ class DbtClient:
     @backoff.on_exception(backoff.expo, HTTPError, max_tries=3, factor=2)
     def list_available_artifacts(self, job_run_id: int) -> list:
         res = requests.get(
-            url=f"https://cloud.getdbt.com/api/v2/accounts/{self.account_id}/runs/{job_run_id}/artifacts/",
+            url=f"{self.base_url}/api/v2/accounts/{self.account_id}/runs/{job_run_id}/artifacts/",
             headers={'Authorization': f"Token {self.api_key}"},
         )
 
