@@ -17,6 +17,8 @@ from client import DbtClient
 
 from keboola.component.exceptions import UserException
 
+KEY_IGNORE_ARTIFACTS = "ignore_artifacts"
+
 # configuration variables
 ACCOUNT_ID = "account_id"
 JOB_ID = "job_id"
@@ -76,7 +78,7 @@ class Component(ComponentBase):
             except TypeError:
                 self.max_wait_time = None
         self.wait_for_result = wait_for_result
-        self.ignore_artifacts = params.get("ignore_artifacts", False)
+        self.ignore_artifacts = params.get(KEY_IGNORE_ARTIFACTS, False)
 
         cwd = Path(os.getcwd())
         root_dir = cwd.parent.absolute()
