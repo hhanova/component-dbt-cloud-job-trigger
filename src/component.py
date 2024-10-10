@@ -117,7 +117,7 @@ class Component(ComponentBase):
 
                 if status == DbtJobRunStatus.SUCCESS:
                     if self.ignore_artifacts:
-                        logging.info(f"Skipping storing of artifacts.")
+                        logging.info("Skipping storing of artifacts.")
                         break
                     for artifact in self._list_available_artifacts(client, job_run_id):
                         client.fetch_artifact(job_run_id, artifact)
