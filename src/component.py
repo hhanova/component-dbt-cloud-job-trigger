@@ -17,6 +17,8 @@ from client import DbtClient
 
 from keboola.component.exceptions import UserException
 
+KEY_IGNORE_ARTIFACTS = "ignore_artifacts"
+
 # configuration variables
 ACCOUNT_ID = "account_id"
 JOB_ID = "job_id"
@@ -76,6 +78,7 @@ class Component(ComponentBase):
             except TypeError:
                 self.max_wait_time = None
         self.wait_for_result = wait_for_result
+        self.ignore_artifacts = params.get(KEY_IGNORE_ARTIFACTS, False)
 
         cwd = Path(os.getcwd())
         root_dir = cwd.parent.absolute()
@@ -104,7 +107,7 @@ class Component(ComponentBase):
         if self.wait_for_result:
             start_time = time.time()
             while True:
-                time.sleep(30)
+                time.sleep(10)
 
                 try:
                     data = self._get_job_run_status(client, job_run_id, get_steps=True)['data']
@@ -115,6 +118,9 @@ class Component(ComponentBase):
                 logging.info(f"Job status = {DbtJobRunStatus(status).name}")
 
                 if status == DbtJobRunStatus.SUCCESS:
+                    if self.ignore_artifacts:
+                        logging.info("Skipping storing of artifacts.")
+                        break
                     for artifact in self._list_available_artifacts(client, job_run_id):
                         client.fetch_artifact(job_run_id, artifact)
                     break
