@@ -1,6 +1,6 @@
 {
     "type": "object",
-    "title": "extractor configuration",
+    "title": "Extractor Configuration",
     "required": [
         "account_id",
         "job_id",
@@ -13,33 +13,33 @@
             "type": "string",
             "title": "Cause",
             "default": "Triggered from Keboola",
-            "description": "String identifier which will be sent along with job trigger request.",
+            "description": "A string identifier that will be sent along with the job trigger request.",
             "propertyOrder": 4
         },
         "job_id": {
             "type": "integer",
             "title": "Job ID",
-            "description": "Numeric ID of the job",
+            "description": "Numeric ID of the job.",
             "propertyOrder": 2
         },
         "#api_key": {
             "type": "string",
-            "title": "API Key",
+            "title": "API key",
             "format": "password",
-            "description": "API Key string, How to get one is explained <a href='https://docs.getdbt.com/docs/dbt-cloud/dbt-cloud-api/user-tokens'>here</a>",
+            "description": "API key string. Instruction on how to obtain one can be found <a href='https://docs.getdbt.com/docs/dbt-cloud/dbt-cloud-api/user-tokens'>here</a>.",
             "propertyOrder": 3
         },
         "account_id": {
             "type": "integer",
             "title": "Account ID",
-            "description": "Numeric ID of the account",
+            "description": "Numeric ID of the account.",
             "propertyOrder": 1
         },
         "dbt_cloud_url": {
             "type": "string",
-            "title": "DBT Cloud URL",
+            "title": "dbt Cloud URL",
             "default": "https://cloud.getdbt.com",
-            "description": "Optional - default is https://cloud.getdbt.com, more information about Dbt URLs <a href='https://docs.getdbt.com/docs/cloud/about-cloud/access-regions-ip-addresses'>here</a>",
+            "description": "Optional – defaults to https://cloud.getdbt.com. More information about dbt URLs can be found <a href='https://docs.getdbt.com/docs/cloud/about-cloud/access-regions-ip-addresses'>here</a>.",
             "propertyOrder": 5
         },
         "max_wait_time": {
@@ -51,14 +51,14 @@
                     "wait_for_result": true
                 }
             },
-            "description": "Max time to wait. Used only when parameter Wait for result is set to true.",
+            "description": "Maximum time to wait. Used only when Wait for result is set to true.",
             "propertyOrder": 7
         },
         "wait_for_result": {
             "type": "boolean",
             "format": "checkbox",
             "title": "Wait for result",
-            "description": "Select this if you want the component to wait until defined job finishes and then store artifacts.",
+            "description": "Select this option if you want the component to wait until the job finishes before storing artifacts.",
             "propertyOrder": 6
         },
         "ignore_artifacts": {
@@ -66,7 +66,7 @@
             "format": "checkbox",
             "default": false,
             "title": "Don't store artifacts",
-            "description": "Select this if you want the component to ignore artifacts.",
+            "description": "Select this option if you want the component to ignore artifacts.",
             "propertyOrder": 6
         }
     }
